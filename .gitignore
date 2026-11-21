@@ -28,3 +28,6 @@ Thumbs.db
 
 # PDF brief
 *.pdf
+
+drawing-qa-agent.zip
+*.zip
