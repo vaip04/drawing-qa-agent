@@ -1,0 +1,9 @@
+tag,type,floor,room,width_mm,height_mm
+D01,door,0,Living Room,1200,2100
+D02,door,0,Bedroom 1,900,2100
+D03,door,0,Bedroom 2,900,2100
+D04,door,0,Toilet 1,750,2100
+D05,door,0,Toilet 2,750,2100
+W01,window,0,Living Room,1800,1500
+W02,window,0,Bedroom 1,1200,1500
+W03,window,0,Kitchen-Dining,1200,1200

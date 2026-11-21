@@ -1,0 +1,4 @@
+on_sheet,callout_type,label,target_sheet,target_view
+A101,section,A,A201,Section A
+A101,section,B,A201,Section B
+A101,detail,1,A301,Window Detail

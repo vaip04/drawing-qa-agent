@@ -1,0 +1,8 @@
+sheet_no,title,brief_version,revision_index,revision_titleblock,has_overall_dims,rooms_dimensioned
+A101,Ground Floor Plan,v2,A,A,True,Living Room;Dining Room;Kitchen;Master Bedroom;Toilet 1;Toilet 2;Passage;Staircase
+A102,First Floor Plan,v2,C,C,True,Bedroom 2;Bedroom 3;Study;Toilet 3;Toilet 4;Passage;Balcony;Staircase
+A201,Sections,v2,A,A,False,
+A202,Elevations,v2,A,A,False,
+A301,Door & Window Details,v2,B,B,False,
+A401,Kitchen Detail,v2,A,A,False,
+A501,Staircase Detail,v2,A,A,False,

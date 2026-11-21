@@ -1,0 +1,18 @@
+finding_id,rule_id,group,severity,sheet_no,element,issue,evidence
+1fbc33a8,R01,RULE_FAILED,high,,Bedroom 2,Area on statement (241.9 sqft) differs from polygon (224.0 sqft) by 8.0%,"polygon=224.0, statement=241.9, diff=8.0%, tolerance=2.0%"
+e03cf0fc,R02,RULE_FAILED,high,,Floor 0 total,Room areas sum to 962.0 but floor total says 950.0,"sum=962.0, written=950.0"
+ec821801,R02,RULE_FAILED,high,,Grand total,Floor totals sum to 1687.9 but grand total says 1800.0,"sum_of_floors=1687.9, written_grand=1800.0"
+bedffab1,R03,RULE_FAILED,high,,Toilet (floor 1),Brief requires 2 but only 1 found,"required=2, found=1"
+ba07a444,R04,RULE_FAILED,medium,,Study,Area 60.0 sqft is below brief minimum 80 sqft (short by 20.0),"area=60.0, min=80"
+c7d2f3d8,R05,RULE_FAILED,high,,Built-up area,Total built-up 1682.0 sqft exceeds limit 1650 sqft,"builtup=1682.0, limit=1650"
+e1ee8975,R06,RULE_FAILED,medium,A201,A201,Sheet has brief_version 'v1' but current brief is 'v2',"sheet_version=v1, brief_version=v2"
+5bd97c90,R06,RULE_FAILED,medium,A301,A301,Sheet has brief_version 'v1' but current brief is 'v2',"sheet_version=v1, brief_version=v2"
+efddacc0,R07,RULE_FAILED,high,A101,section A,Callout points to sheet A601 which does not exist,"on_sheet=A101, target=A601"
+f08ee8f6,R08,RULE_FAILED,high,,D07,Door D07 is on the plan but missing from the schedule,"tag=D07, on_plan=True, in_schedule=False"
+226ff014,R08,RULE_FAILED,high,,W04,Window W04 size mismatch: plan 1200×1500mm vs schedule 1500×1500mm,"plan=1200x1500, schedule=1500x1500"
+01c297cf,R09,RULE_FAILED,medium,A102,A102,Revision index 'C' does not match titleblock revision 'B',"index=C, titleblock=B"
+c8fcabc5,R10,RULE_FAILED,medium,A101,Kitchen,Room 'Kitchen' not dimensioned on sheet A101,"room=Kitchen, sheet=A101"
+1603178f,R10,RULE_FAILED,medium,A101,Mstr Bed,Room 'Mstr Bed' not dimensioned on sheet A101,"room=Mstr Bed, sheet=A101"
+6382ba5d,R11,NEEDS_REVIEW,low,,Mstr Bed,Room name 'Mstr Bed' may be a variant of brief requirement 'Master Bedroom',"rooms='Mstr Bed', brief='Master Bedroom', score=73"
+c9ef47a9,R12,NEEDS_REVIEW,medium,,Passage / Balcony,Rooms overlap by 8.0 sqft on floor 1,overlap=8.0 sqft
+f8fc64e4,R13,NEEDS_REVIEW,low,,Passage,Room has narrow aspect ratio 3.5:1 (threshold 3.0:1),"aspect_ratio=3.5, threshold=3.0"

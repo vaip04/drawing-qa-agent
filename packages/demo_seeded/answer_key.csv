@@ -1,0 +1,13 @@
+error_id,rule_id,group,description
+1,R01,RULE_FAILED,Bedroom 2 area on statement 8% higher than polygon (224 vs 241.9)
+2,R02,RULE_FAILED,Ground-floor total 950 != sum of room areas 962
+3,R02,RULE_FAILED,Grand total 1800 != sum of floor totals
+4,R03,RULE_FAILED,Brief requires 2 toilets on floor 1; only 1 exists
+5,R04,RULE_FAILED,Study area 60 sqft is 20 below brief minimum 80
+6,R05,RULE_FAILED,Built-up area exceeds brief limit of 1650 sqft
+7,R06,RULE_FAILED,"Sheets A201, A301 carry brief_version v1; brief is v2"
+8,R07,RULE_FAILED,Section callout A on A101 targets non-existent sheet A601
+9,R08,RULE_FAILED,Door D07 on plan but missing from schedule
+10,R08,RULE_FAILED,Window W04 width 1200mm on plan vs 1500mm in schedule
+11,R09,RULE_FAILED,Sheet A102 revision index C != titleblock revision B
+12,R10,RULE_FAILED,Kitchen not dimensioned on sheet A101

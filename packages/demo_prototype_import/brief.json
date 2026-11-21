@@ -1,0 +1,51 @@
+{
+  "project": "PrototypeDemoVilla (Unverified Import)",
+  "brief_version": "v1-proto",
+  "plot": {
+    "w": 50,
+    "d": 70,
+    "setbacks": {
+      "front": 12,
+      "rear": 8,
+      "left": 4,
+      "right": 4
+    }
+  },
+  "limits": {
+    "max_builtup_sqft": 2000,
+    "max_ground_coverage_pct": 50,
+    "floors": 1
+  },
+  "required_rooms": [
+    {
+      "name": "Living Room",
+      "floor": 0,
+      "min_area_sqft": 220,
+      "count": 1
+    },
+    {
+      "name": "Master Bedroom",
+      "floor": 0,
+      "min_area_sqft": 180,
+      "count": 1
+    },
+    {
+      "name": "Kitchen",
+      "floor": 0,
+      "min_area_sqft": 90,
+      "count": 1
+    },
+    {
+      "name": "Dining Room",
+      "floor": 0,
+      "min_area_sqft": 120,
+      "count": 1
+    },
+    {
+      "name": "Toilet",
+      "floor": 0,
+      "min_area_sqft": 40,
+      "count": 2
+    }
+  ]
+}

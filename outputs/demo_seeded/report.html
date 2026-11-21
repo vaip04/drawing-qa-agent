@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Drawing Review Report - DemoVilla</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2rem; background: #fdfdfd; color: #222; }
+  h1, h2, h3 { color: #111; }
+  .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+  .badge-failed { background: #ffebe9; color: #cf222e; border: 1px solid #ff8182; }
+  .badge-review { background: #fff8c5; color: #9a6700; border: 1px solid #d4a72c; }
+  .badge-high { background: #cf222e; color: #fff; }
+  .badge-medium { background: #fb8f44; color: #fff; }
+  .badge-low { background: #54aeff; color: #fff; }
+  .summary-card { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 1.25rem; margin-bottom: 2rem; display: flex; gap: 2rem; }
+  .metric { display: flex; flex-direction: column; }
+  .metric-val { font-size: 1.8rem; font-weight: bold; }
+  .metric-lbl { color: #57609a; font-size: 0.85rem; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  th, td { border: 1px solid #d0d7de; padding: 8px 12px; text-align: left; }
+  th { background-color: #f6f8fa; }
+  tr:nth-child(even) { background-color: #fafbfc; }
+  .plan-container { margin: 2rem 0; }
+  .plan-img { max-width: 100%; height: auto; border: 1px solid #d0d7de; border-radius: 6px; }
+  .guardrail-log { background: #f6f8fa; border-left: 4px solid #0969da; padding: 1rem; border-radius: 4px; margin-top: 1rem; }
+  .prose-summary { background: #e8f4fc; border-left: 4px solid #1f883d; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; font-style: italic; }
+</style>
+</head>
+<body>
+  <h1>Drawing QA Review Report</h1>
+  <div class="summary-card">
+    <div class="metric"><span class="metric-val">DemoVilla</span><span class="metric-lbl">Project</span></div>
+    <div class="metric"><span class="metric-val">v2</span><span class="metric-lbl">Brief Version</span></div>
+    <div class="metric"><span class="metric-val">NO-LLM</span><span class="metric-lbl">Execution Mode</span></div>
+    <div class="metric"><span class="metric-val" style="color: #cf222e;">14</span><span class="metric-lbl">Rule Failed</span></div>
+    <div class="metric"><span class="metric-val" style="color: #9a6700;">3</span><span class="metric-lbl">Needs Review</span></div>
+  </div>
+
+  
+
+  <h2>1. Rule Failed (Objective / Code-measured)</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>Severity</th>
+        <th>Sheet</th>
+        <th>Element</th>
+        <th>Issue Description</th>
+        <th>Evidence</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><code>R01</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Bedroom 2</strong></td>
+        <td>Area on statement (241.9 sqft) differs from polygon (224.0 sqft) by 8.0%</td>
+        <td><code>polygon=224.0, statement=241.9, diff=8.0%, tolerance=2.0%</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R02</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Floor 0 total</strong></td>
+        <td>Room areas sum to 962.0 but floor total says 950.0</td>
+        <td><code>sum=962.0, written=950.0</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R02</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Grand total</strong></td>
+        <td>Floor totals sum to 1687.9 but grand total says 1800.0</td>
+        <td><code>sum_of_floors=1687.9, written_grand=1800.0</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R03</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Toilet (floor 1)</strong></td>
+        <td>Brief requires 2 but only 1 found</td>
+        <td><code>required=2, found=1</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R05</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Built-up area</strong></td>
+        <td>Total built-up 1682.0 sqft exceeds limit 1650 sqft</td>
+        <td><code>builtup=1682.0, limit=1650</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R07</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>A101</td>
+        <td><strong>section A</strong></td>
+        <td>Callout points to sheet A601 which does not exist</td>
+        <td><code>on_sheet=A101, target=A601</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R08</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>D07</strong></td>
+        <td>Door D07 is on the plan but missing from the schedule</td>
+        <td><code>tag=D07, on_plan=True, in_schedule=False</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R08</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>W04</strong></td>
+        <td>Window W04 size mismatch: plan 1200×1500mm vs schedule 1500×1500mm</td>
+        <td><code>plan=1200x1500, schedule=1500x1500</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R04</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>-</td>
+        <td><strong>Study</strong></td>
+        <td>Area 60.0 sqft is below brief minimum 80 sqft (short by 20.0)</td>
+        <td><code>area=60.0, min=80</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R06</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>A201</td>
+        <td><strong>A201</strong></td>
+        <td>Sheet has brief_version 'v1' but current brief is 'v2'</td>
+        <td><code>sheet_version=v1, brief_version=v2</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R06</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>A301</td>
+        <td><strong>A301</strong></td>
+        <td>Sheet has brief_version 'v1' but current brief is 'v2'</td>
+        <td><code>sheet_version=v1, brief_version=v2</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R09</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>A102</td>
+        <td><strong>A102</strong></td>
+        <td>Revision index 'C' does not match titleblock revision 'B'</td>
+        <td><code>index=C, titleblock=B</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R10</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>A101</td>
+        <td><strong>Kitchen</strong></td>
+        <td>Room 'Kitchen' not dimensioned on sheet A101</td>
+        <td><code>room=Kitchen, sheet=A101</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R10</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>A101</td>
+        <td><strong>Mstr Bed</strong></td>
+        <td>Room 'Mstr Bed' not dimensioned on sheet A101</td>
+        <td><code>room=Mstr Bed, sheet=A101</code></td>
+        
+      </tr>
+      
+    </tbody>
+  </table>
+  
+
+  <h2>2. Needs Human Review (Judgement & Intent)</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>Severity</th>
+        <th>Sheet</th>
+        <th>Element</th>
+        <th>Observation</th>
+        <th>Evidence</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><code>R12</code></td>
+        <td><span class="badge badge-medium">MEDIUM</span></td>
+        <td>-</td>
+        <td><strong>Passage / Balcony</strong></td>
+        <td>Rooms overlap by 8.0 sqft on floor 1</td>
+        <td><code>overlap=8.0 sqft</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R11</code></td>
+        <td><span class="badge badge-low">LOW</span></td>
+        <td>-</td>
+        <td><strong>Mstr Bed</strong></td>
+        <td>Room name 'Mstr Bed' may be a variant of brief requirement 'Master Bedroom'</td>
+        <td><code>rooms='Mstr Bed', brief='Master Bedroom', score=73</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R13</code></td>
+        <td><span class="badge badge-low">LOW</span></td>
+        <td>-</td>
+        <td><strong>Passage</strong></td>
+        <td>Room has narrow aspect ratio 3.5:1 (threshold 3.0:1)</td>
+        <td><code>aspect_ratio=3.5, threshold=3.0</code></td>
+        
+      </tr>
+      
+    </tbody>
+  </table>
+  
+
+  <h2>3. Annotated Drawing Plan</h2>
+  <div class="plan-container">
+    <img src="plan_annotated.png" alt="Annotated Plan" class="plan-img">
+  </div>
+
+  <h2>4. Guardrail Verification Log</h2>
+  <div class="guardrail-log">
+    <p><strong>Guardrail Status:</strong> Active</p>
+    <p><strong>Rejected / Hallucinated Findings Dropped:</strong> 0</p>
+    <p><strong>Restored Tampered Findings:</strong> 0</p>
+    
+  </div>
+
+  <p style="margin-top: 3rem; color: #888; font-size: 0.8rem;">
+    Generated by Drawing QA Agent &bull; <em>AI proposes, code checks, people approve.</em>
+  </p>
+</body>
+</html>

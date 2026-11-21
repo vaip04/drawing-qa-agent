@@ -1,0 +1,93 @@
+{
+  "project": "DemoVilla",
+  "brief_version": "v2",
+  "plot": {
+    "w": 50,
+    "d": 80,
+    "setbacks": {
+      "front": 15,
+      "rear": 10,
+      "left": 5,
+      "right": 5
+    }
+  },
+  "limits": {
+    "max_builtup_sqft": 1650,
+    "max_ground_coverage_pct": 55,
+    "floors": 2
+  },
+  "required_rooms": [
+    {
+      "name": "Living Room",
+      "floor": 0,
+      "min_area_sqft": 250,
+      "count": 1
+    },
+    {
+      "name": "Dining Room",
+      "floor": 0,
+      "min_area_sqft": 120,
+      "count": 1
+    },
+    {
+      "name": "Kitchen",
+      "floor": 0,
+      "min_area_sqft": 80,
+      "count": 1
+    },
+    {
+      "name": "Master Bedroom",
+      "floor": 0,
+      "min_area_sqft": 180,
+      "count": 1
+    },
+    {
+      "name": "Toilet",
+      "floor": 0,
+      "min_area_sqft": 35,
+      "count": 2
+    },
+    {
+      "name": "Staircase",
+      "floor": 0,
+      "min_area_sqft": 50,
+      "count": 1
+    },
+    {
+      "name": "Bedroom",
+      "floor": 1,
+      "min_area_sqft": 150,
+      "count": 2
+    },
+    {
+      "name": "Study",
+      "floor": 1,
+      "min_area_sqft": 80,
+      "count": 1
+    },
+    {
+      "name": "Toilet",
+      "floor": 1,
+      "min_area_sqft": 35,
+      "count": 2
+    },
+    {
+      "name": "Passage",
+      "floor": 1,
+      "min_area_sqft": 35,
+      "count": 1
+    },
+    {
+      "name": "Balcony",
+      "floor": 1,
+      "min_area_sqft": 50,
+      "count": 1
+    },
+    {
+      "name": "Staircase",
+      "floor": 1,
+      "min_area_sqft": 50,
+      "count": 1
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+finding_id,rule_id,group,severity,sheet_no,element,issue,evidence
+1da4ebb7,R01,RULE_FAILED,high,,Living Room,Area on statement (267.1 sqft) differs from polygon (252.0 sqft) by 6.0%,"polygon=252.0, statement=267.1, diff=6.0%, tolerance=2.0%"
+a4b96a67,R02,RULE_FAILED,high,,Floor 0 total,Room areas sum to 915.1 but floor total says 900.0,"sum=915.1, written=900.0"
+53b82ff3,R03,RULE_FAILED,high,,Bedroom (floor 0),Brief requires 3 but only 2 found,"required=3, found=2"
+809aa615,R05,RULE_FAILED,high,,Ground coverage,Coverage 37.5% exceeds limit 35%,"coverage=37.5%, limit=35%"
+8bfd0731,R07,RULE_FAILED,high,A101,detail 1,Callout points to sheet A301 which does not exist,"on_sheet=A101, target=A301"
+30f1b1d5,R08,RULE_FAILED,high,,W02,Window W02 size mismatch: plan 1200×1500mm vs schedule 1000×1500mm,"plan=1200x1500, schedule=1000x1500"

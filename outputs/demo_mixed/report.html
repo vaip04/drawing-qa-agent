@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Drawing Review Report - DemoBungalow</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 2rem; background: #fdfdfd; color: #222; }
+  h1, h2, h3 { color: #111; }
+  .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; }
+  .badge-failed { background: #ffebe9; color: #cf222e; border: 1px solid #ff8182; }
+  .badge-review { background: #fff8c5; color: #9a6700; border: 1px solid #d4a72c; }
+  .badge-high { background: #cf222e; color: #fff; }
+  .badge-medium { background: #fb8f44; color: #fff; }
+  .badge-low { background: #54aeff; color: #fff; }
+  .summary-card { background: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 1.25rem; margin-bottom: 2rem; display: flex; gap: 2rem; }
+  .metric { display: flex; flex-direction: column; }
+  .metric-val { font-size: 1.8rem; font-weight: bold; }
+  .metric-lbl { color: #57609a; font-size: 0.85rem; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; margin-bottom: 2rem; font-size: 0.9rem; }
+  th, td { border: 1px solid #d0d7de; padding: 8px 12px; text-align: left; }
+  th { background-color: #f6f8fa; }
+  tr:nth-child(even) { background-color: #fafbfc; }
+  .plan-container { margin: 2rem 0; }
+  .plan-img { max-width: 100%; height: auto; border: 1px solid #d0d7de; border-radius: 6px; }
+  .guardrail-log { background: #f6f8fa; border-left: 4px solid #0969da; padding: 1rem; border-radius: 4px; margin-top: 1rem; }
+  .prose-summary { background: #e8f4fc; border-left: 4px solid #1f883d; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; font-style: italic; }
+</style>
+</head>
+<body>
+  <h1>Drawing QA Review Report</h1>
+  <div class="summary-card">
+    <div class="metric"><span class="metric-val">DemoBungalow</span><span class="metric-lbl">Project</span></div>
+    <div class="metric"><span class="metric-val">v1</span><span class="metric-lbl">Brief Version</span></div>
+    <div class="metric"><span class="metric-val">NO-LLM</span><span class="metric-lbl">Execution Mode</span></div>
+    <div class="metric"><span class="metric-val" style="color: #cf222e;">6</span><span class="metric-lbl">Rule Failed</span></div>
+    <div class="metric"><span class="metric-val" style="color: #9a6700;">0</span><span class="metric-lbl">Needs Review</span></div>
+  </div>
+
+  
+
+  <h2>1. Rule Failed (Objective / Code-measured)</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>Severity</th>
+        <th>Sheet</th>
+        <th>Element</th>
+        <th>Issue Description</th>
+        <th>Evidence</th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td><code>R01</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Living Room</strong></td>
+        <td>Area on statement (267.1 sqft) differs from polygon (252.0 sqft) by 6.0%</td>
+        <td><code>polygon=252.0, statement=267.1, diff=6.0%, tolerance=2.0%</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R02</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Floor 0 total</strong></td>
+        <td>Room areas sum to 915.1 but floor total says 900.0</td>
+        <td><code>sum=915.1, written=900.0</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R03</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Bedroom (floor 0)</strong></td>
+        <td>Brief requires 3 but only 2 found</td>
+        <td><code>required=3, found=2</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R05</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>Ground coverage</strong></td>
+        <td>Coverage 37.5% exceeds limit 35%</td>
+        <td><code>coverage=37.5%, limit=35%</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R07</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>A101</td>
+        <td><strong>detail 1</strong></td>
+        <td>Callout points to sheet A301 which does not exist</td>
+        <td><code>on_sheet=A101, target=A301</code></td>
+        
+      </tr>
+      
+      <tr>
+        <td><code>R08</code></td>
+        <td><span class="badge badge-high">HIGH</span></td>
+        <td>-</td>
+        <td><strong>W02</strong></td>
+        <td>Window W02 size mismatch: plan 1200×1500mm vs schedule 1000×1500mm</td>
+        <td><code>plan=1200x1500, schedule=1000x1500</code></td>
+        
+      </tr>
+      
+    </tbody>
+  </table>
+  
+
+  <h2>2. Needs Human Review (Judgement & Intent)</h2>
+  
+  <p><em>No items flagged for human review.</em></p>
+  
+
+  <h2>3. Annotated Drawing Plan</h2>
+  <div class="plan-container">
+    <img src="plan_annotated.png" alt="Annotated Plan" class="plan-img">
+  </div>
+
+  <h2>4. Guardrail Verification Log</h2>
+  <div class="guardrail-log">
+    <p><strong>Guardrail Status:</strong> Active</p>
+    <p><strong>Rejected / Hallucinated Findings Dropped:</strong> 0</p>
+    <p><strong>Restored Tampered Findings:</strong> 0</p>
+    
+  </div>
+
+  <p style="margin-top: 3rem; color: #888; font-size: 0.8rem;">
+    Generated by Drawing QA Agent &bull; <em>AI proposes, code checks, people approve.</em>
+  </p>
+</body>
+</html>

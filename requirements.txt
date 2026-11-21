@@ -1,0 +1,22 @@
+# Drawing QA Agent — pinned dependencies
+# Core
+pandas==2.2.3
+shapely==2.0.6
+matplotlib==3.9.3
+pyyaml==6.0.2
+python-dotenv==1.0.1
+thefuzz==0.22.1
+python-Levenshtein==0.26.1
+jinja2==3.1.4
+
+# LangChain / LLM
+langchain==0.3.14
+langgraph==0.2.60
+langchain-core==0.3.29
+langchain-google-genai==2.0.8
+
+# Testing
+pytest==8.3.4
+
+# UI
+streamlit==1.41.1

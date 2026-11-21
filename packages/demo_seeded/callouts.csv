@@ -1,0 +1,6 @@
+on_sheet,callout_type,label,target_sheet,target_view
+A101,section,A,A601,Section A
+A101,section,B,A201,Section B
+A101,detail,1,A401,Kitchen Detail
+A102,detail,2,A501,Staircase Detail
+A201,detail,3,A301,Window Head Detail

@@ -1,0 +1,7 @@
+floor,room_name,area_sqft,floor_total_sqft,grand_total_sqft
+0,Living Room,252.0,,
+0,Master Bedroom,196.0,,
+0,Kitchen,100.0,,
+0,Dining Room,120.0,,
+0,Toilet 1,48.0,,
+0,Toilet 2,48.0,764.0,764.0

@@ -1,0 +1,19 @@
+# Drawing QA Agent — Rule configuration
+# Change tolerances here without touching code.
+
+tolerances:
+  # R01: polygon area vs area statement mismatch tolerance
+  area_mismatch_pct: 2.0
+
+  # R05: built-up area tolerance against brief limit (0 = exact)
+  builtup_tolerance_pct: 0.0
+  coverage_tolerance_pct: 0.0
+
+  # R11: fuzzy name match minimum score (0–100)
+  name_match_threshold: 70
+
+  # R13: aspect ratio above which a room is flagged for review
+  narrow_aspect_ratio: 3.0
+
+  # R08: opening size tolerance in mm
+  opening_size_tolerance_mm: 0

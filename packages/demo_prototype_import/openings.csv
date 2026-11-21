@@ -1,0 +1,4 @@
+tag,type,floor,room,width_mm,height_mm
+D01,door,0,Living Room,1200,2100
+D02,door,0,Master Bedroom,900,2100
+W01,window,0,Living Room,1800,1500
