@@ -6,6 +6,10 @@
 
 ---
 
+[Project 1 (AEC-Eval-30)](https://github.com/vaip04/AEC-Eval-30) measures where AI coworkers fail; Project 2 (drawing-qa-agent) builds the guardrail.
+
+**LLM mode not yet benchmarked.** Guardrail drops have not been measured on a live model run.
+
 ## 1. What It Does
 
 Given an architectural **drawing package** (project brief, area statement, room vector geometry, sheet index with callouts and revisions, and door/window tags and schedules), the **Drawing QA Agent**:
@@ -63,15 +67,15 @@ Given an architectural **drawing package** (project brief, area statement, room 
 
 | Package | Mode | Planted Errors | Caught | Missed | False Flags | Precision | Recall | Review Traps Grouped | Guardrail Dropped |
 |---|---|---|---|---|---|---|---|---|---|
-| `demo_clean` | **NO-LLM** | 0 | 0 | 0 | 0 | **100.0%** | **100.0%** | Pass (Review) (0) | 0 |
-| `demo_seeded` | **NO-LLM** | 12 | 12 | 0 | 1 | **92.3%** | **100.0%** | Pass (Review) (3) | 0 |
+| `demo_clean` | **NO-LLM** | 0 | 0 | 0 | 0 | n/a: 0 flags on a clean set | n/a: 0 planted errors | Pass (Review) (0) | 0 |
+| `demo_seeded` | **NO-LLM** | 12 | 12 | 0 | 0 | **100.0%** | **100.0%** | Pass (Review) (3) | 0 |
 | `demo_mixed` | **NO-LLM** | 6 | 6 | 0 | 0 | **100.0%** | **100.0%** | Pass (Review) (0) | 0 |
 
 ### Evaluation Insights
 - **100% Defect Recall:** Caught all 12 planted errors in `demo_seeded` and all 6 planted errors in `demo_mixed`.
 - **Zero False Positives on Clean Sets:** `demo_clean` produced exactly 0 `RULE_FAILED` findings across all 13 rules.
 - **Accurate Review Trapping:** Review traps (such as 3.5:1 narrow passage and "Mstr Bed" naming variant) cleanly landed in `NEEDS_REVIEW` without triggering false alarms.
-- **Duplicate Sheet Note:** The 1 false flag in `demo_seeded` represents Error #7 spanning two sheets (`A201` and `A301`) carrying legacy brief version `v1`.
+- **Duplicate Sheet Note:** Error #7 spans two sheets (`A201` and `A301`). Both sheet findings count toward one caught error, with no false flag.
 
 ---
 
@@ -80,7 +84,7 @@ Given an architectural **drawing package** (project brief, area statement, room 
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/patidarvaibhav/drawing-qa-agent.git
+git clone https://github.com/vaip04/drawing-qa-agent.git
 cd drawing-qa-agent
 
 # Create Python 3.12 virtual environment & install dependencies
