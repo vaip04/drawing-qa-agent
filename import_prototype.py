@@ -9,7 +9,10 @@ import json
 import pandas as pd
 from make_packages import write_package, rect, build_area_statement
 
-PROTOTYPE_DIR = Path(r"C:\Users\vvaib\Downloads\furniture_catalogue")
+import os
+# Folder holding the prototype's reference CSVs (space_standards.csv, room_name_map.csv).
+# Set PROTOTYPE_DIR in .env or your shell; defaults to ./prototype_data
+PROTOTYPE_DIR = Path(os.getenv("PROTOTYPE_DIR", "prototype_data"))
 
 
 def import_prototype():

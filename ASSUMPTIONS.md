@@ -2,7 +2,7 @@
 
 This document records all engineering choices, reasonable assumptions, and interpretations made while implementing the specifications in `AGENTS.md`.
 
-## 1. Prototype Directory & Inputs (`C:\Users\vvaib\Downloads\furniture_catalogue`)
+## 1. Prototype Directory & Inputs (my prototype's reference-data folder)
 - **Observation:** The provided prototype path contains reference standards and catalogues (`furniture_catalogue.csv`, `interior_finishes.csv`, `live_loads.csv`, `rates_boq.csv`, `room_name_map.csv`, `seismic_zones.csv`, `space_standards.csv`, `structural_rules.csv`, `vastu_rules_v1.csv`).
 - **Assumption:** It does not contain direct drawing exports or geometry for `DemoVilla` / `DemoBungalow` (e.g. DXF/IFC/JSON layout exports). Per AGENTS.md Section 5 ("Source 2: his prototype... Whatever can't be extracted is listed in ASSUMPTIONS.md. If the prototype isn't available or can't be parsed in reasonable time, skip it and say so. Never fake it."), we built `import_prototype.py` to extract room standard minimum areas and naming mappings from `space_standards.csv` and `room_name_map.csv` to synthesize a test package `demo_prototype_import` reflecting those exact standards, and marked findings as unverified.
 

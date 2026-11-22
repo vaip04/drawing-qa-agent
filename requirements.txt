@@ -1,4 +1,4 @@
-# Drawing QA Agent — pinned dependencies
+# Drawing QA Agent: tested together on 21 Nov 2026 (Python 3.12 / 3.13)
 # Core
 pandas==2.2.3
 shapely==2.0.6
@@ -9,14 +9,15 @@ thefuzz==0.22.1
 python-Levenshtein==0.26.1
 jinja2==3.1.4
 
-# LangChain / LLM
-langchain==0.3.14
-langgraph==0.2.60
-langchain-core==0.3.29
-langchain-google-genai==2.0.8
+# LangChain agent + Gemini
+langchain==1.5.2
+langchain-core==1.8.4
+langgraph==1.2.24
+langgraph-prebuilt==1.1.3
+langgraph-checkpoint==4.3.2
+langchain-google-genai==4.5.2
+# Optional fallbacks: pip install langchain-openai  /  pip install langchain-anthropic
 
-# Testing
+# Testing and UI
 pytest==8.3.4
-
-# UI
-streamlit==1.41.1
+streamlit==1.67.0

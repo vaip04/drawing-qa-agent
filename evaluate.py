@@ -1,176 +1,136 @@
-"""Evaluation script: compares findings against answer_key.csv for packages.
+"""Evaluation: compare the reviewer's findings with each package's answer key.
 
-Produces outputs/eval.md with exact precision, recall, caught, missed, and false flags.
-Never invents numbers: computes strictly from real execution results.
+A planted error counts as CAUGHT only when a RULE_FAILED finding has the same rule_id
+AND the same element (an error that spans several sheets, e.g. "A201;A301", is caught
+when every listed element is flagged). Any other RULE_FAILED finding is a FALSE FLAG.
+Review traps must land in NEEDS_REVIEW, never in RULE_FAILED.
+
+LLM mode never falls back silently: if the model fails, the row says so.
 
 Usage:
-  python evaluate.py [--no-llm]
+  python evaluate.py            # both modes
+  python evaluate.py --no-llm   # deterministic checks only
+  python evaluate.py --llm-only # LLM agent only
 """
 
 import argparse
-import sys
+from datetime import date
 from pathlib import Path
-import pandas as pd
+
 from src.loader import load_package, load_rules
 from src.checks import run_all_checks
 
+PACKAGES = ["demo_clean", "demo_seeded", "demo_mixed"]
+REVIEW_TRAPS = {"demo_seeded": {"R11", "R13"}}  # rules that must appear as NEEDS_REVIEW
+
+
+def _norm(x) -> str:
+    return str(x).strip().lower()
+
+
+def score(findings, answer_key):
+    """Match findings to the answer key by rule_id + element."""
+    failed = [f for f in findings if f.get("group") == "RULE_FAILED"]
+    used = set()
+    caught, missed = [], []
+    if answer_key is not None and not answer_key.empty:
+        for _, ans in answer_key.iterrows():
+            elements = [_norm(e) for e in str(ans["element"]).split(";") if e.strip()]
+            hits = [i for i, f in enumerate(failed)
+                    if f.get("rule_id") == ans["rule_id"] and _norm(f.get("element")) in elements]
+            hit_elements = {_norm(failed[i].get("element")) for i in hits}
+            if set(elements) <= hit_elements:
+                caught.append(int(ans["error_id"]))
+                used.update(hits)
+            else:
+                missed.append(f"#{ans['error_id']} {ans['rule_id']} {ans['element']}")
+    false_flags = [f"{f.get('rule_id')} {f.get('element')}" for i, f in enumerate(failed) if i not in used]
+    return caught, missed, false_flags
+
 
 def evaluate_package(pkg_name: str, mode: str = "no-llm") -> dict:
-    pkg_path = Path("packages") / pkg_name
-    pkg = load_package(pkg_path)
+    pkg = load_package(Path("packages") / pkg_name)
     rules = load_rules()
+    log, status = {}, "ok"
 
     if mode == "no-llm":
         findings = run_all_checks(pkg, rules)
-        guardrail_log = {"rejected_unsupported": [], "restored_count": 0}
     else:
         try:
             from src.agent import run_reviewer_agent
             res = run_reviewer_agent(pkg, rules)
-            findings = res["findings"]
-            guardrail_log = res.get("guardrail_log", {"rejected_unsupported": [], "restored_count": 0})
+            findings, log = res["findings"], res["guardrail_log"]
         except Exception as e:
-            print(f"[WARN] LLM evaluation fell back: {e}")
-            findings = run_all_checks(pkg, rules)
-            guardrail_log = {"rejected_unsupported": [], "restored_count": 0}
+            return {"pkg": pkg_name, "mode": mode, "status": f"LLM FAILED: {str(e)[:160]}"}
 
-    # Extract detected rule failures and review items
-    failed_findings = [f for f in findings if f.get("group") == "RULE_FAILED"]
-    review_findings = [f for f in findings if f.get("group") == "NEEDS_REVIEW"]
-
-    # Rule IDs triggered
-    detected_rule_counts = {}
-    for f in failed_findings:
-        rid = f.get("rule_id")
-        detected_rule_counts[rid] = detected_rule_counts.get(rid, 0) + 1
-
-    answer_key = pkg.get("answer_key")
-    if answer_key is None or answer_key.empty:
-        # Clean package evaluation (no planted errors)
-        false_flags = len(failed_findings)
-        precision = 1.0 if false_flags == 0 else 0.0
-        recall = 1.0
-        return {
-            "pkg": pkg_name,
-            "mode": mode,
-            "planted": 0,
-            "caught": 0,
-            "missed": 0,
-            "false_flags": false_flags,
-            "precision": precision,
-            "recall": recall,
-            "correct_grouping": len(failed_findings) == 0,
-            "review_count": len(review_findings),
-            "guardrail_rejected": len(guardrail_log.get("rejected_unsupported", [])),
-        }
-
-    # Match against answer key
-    # Answer key has: error_id, rule_id, group, description
-    planted_total = len(answer_key)
-    caught = 0
-    missed = 0
-    missed_errors = []
-
-    # Count how many planted errors were covered
-    detected_rules_available = detected_rule_counts.copy()
-    for _, ans in answer_key.iterrows():
-        rid = ans["rule_id"]
-        required_findings = 2 if pkg_name == "demo_seeded" and int(ans["error_id"]) == 7 else 1
-        if detected_rules_available.get(rid, 0) >= required_findings:
-            caught += 1
-            detected_rules_available[rid] -= required_findings
-        else:
-            missed += 1
-            missed_errors.append(f"{rid}: {ans['description']}")
-
-    # Any remaining detected rule failures not corresponding to answer key are false flags
-    false_flags = sum(detected_rules_available.values())
-
-    precision = caught / (caught + false_flags) if (caught + false_flags) > 0 else 1.0
-    recall = caught / planted_total if planted_total > 0 else 1.0
+    ak = pkg.get("answer_key")
+    planted = 0 if ak is None or ak.empty else len(ak)
+    caught, missed, false_flags = score(findings, ak)
+    review_rules = {f["rule_id"] for f in findings if f.get("group") == "NEEDS_REVIEW"}
+    failed_rules = {f["rule_id"] for f in findings if f.get("group") == "RULE_FAILED"}
+    traps = REVIEW_TRAPS.get(pkg_name, set())
+    traps_ok = traps <= review_rules and not (traps & failed_rules)
 
     return {
-        "pkg": pkg_name,
-        "mode": mode,
-        "planted": planted_total,
-        "caught": caught,
-        "missed": missed,
-        "missed_errors": missed_errors,
-        "false_flags": false_flags,
-        "precision": round(precision, 4),
-        "recall": round(recall, 4),
-        "correct_grouping": len(review_findings) >= 2 if pkg_name == "demo_seeded" else True,
-        "review_count": len(review_findings),
-        "guardrail_rejected": len(guardrail_log.get("rejected_unsupported", [])),
+        "pkg": pkg_name, "mode": mode, "status": status,
+        "planted": planted, "caught": len(caught), "missed": missed, "false_flags": false_flags,
+        "precision": len(caught) / (len(caught) + len(false_flags)) if (caught or false_flags) else None,
+        "recall": len(caught) / planted if planted else None,
+        "traps": "n/a" if not traps else ("pass" if traps_ok else "FAIL"),
+        "review_count": sum(1 for f in findings if f.get("group") == "NEEDS_REVIEW"),
+        "dropped": len(log.get("rejected_unsupported", [])),
+        "restored": log.get("restored_count", 0),
+        "agent_tools": len(log.get("tools_called_by_agent", [])) if mode != "no-llm" else None,
+        "skipped": log.get("tools_run_by_code_after_agent_skipped", []),
+        "model": log.get("model"),
     }
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Evaluate Drawing QA Agent")
-    parser.add_argument("--no-llm", action="store_true", help="Run evaluation in no-llm mode only")
-    parser.add_argument("--llm-only", action="store_true", help="Run evaluation in LLM mode only")
-    args = parser.parse_args()
-
-    modes = []
-    if args.no_llm:
-        modes = ["no-llm"]
-    elif args.llm_only:
-        modes = ["llm"]
-    else:
-        modes = ["no-llm", "llm"]
-
-    packages = ["demo_clean", "demo_seeded", "demo_mixed"]
-    results = []
-
-    for mode in modes:
-        for pkg in packages:
-            res = evaluate_package(pkg, mode=mode)
-            results.append(res)
-
-    # Format Markdown table
-    md_lines = [
-        "# Drawing QA Agent — Evaluation Report",
-        "",
-        "> Generated automatically by `evaluate.py`. No invented numbers.",
-        "",
-        "## Performance Summary",
-        "",
-        "| Package | Mode | Planted Errors | Caught | Missed | False Flags | Precision | Recall | Review Traps Grouped | Guardrail Dropped |",
-        "|---|---|---|---|---|---|---|---|---|---|",
-    ]
-
+def to_markdown(results):
+    L = ["# Drawing QA Agent: evaluation", "",
+         f"Generated by `evaluate.py` on {date.today().isoformat()}. Every number below comes from running the code.", "",
+         "| Package | Mode | Planted | Caught | Missed | False flags | Precision | Recall | Review traps | Guardrail: dropped / restored | Checks called by agent |",
+         "|---|---|---|---|---|---|---|---|---|---|---|"]
+    notes = []
     for r in results:
-        grouping_str = "Pass (Review)" if r["correct_grouping"] else "Fail"
-        precision_text = "n/a: 0 flags on a clean set" if r["planted"] == 0 and r["false_flags"] == 0 else f"{r['precision'] * 100:.1f}%"
-        recall_text = "n/a: 0 planted errors" if r["planted"] == 0 else f"{r['recall'] * 100:.1f}%"
-        md_lines.append(
-            f"| `{r['pkg']}` | **{r['mode'].upper()}** | {r['planted']} | {r['caught']} | {r['missed']} | {r['false_flags']} | {precision_text} | {recall_text} | {grouping_str} ({r['review_count']}) | {r['guardrail_rejected']} |"
-        )
+        if r.get("status", "ok") != "ok":
+            L.append(f"| `{r['pkg']}` | {r['mode']} | {r['status']} |  |  |  |  |  |  |  |  |")
+            continue
+        agent = "n/a" if r["agent_tools"] is None else f"{r['agent_tools']} of 13"
+        precision = f"{r['precision']*100:.0f}%" if r['precision'] is not None else "n/a: 0 flags on a clean set"
+        recall = f"{r['recall']*100:.0f}%" if r['recall'] is not None else "n/a: 0 planted errors"
+        L.append(f"| `{r['pkg']}` | {r['mode']} | {r['planted']} | {r['caught']} | {len(r['missed'])} | {len(r['false_flags'])} | "
+                 f"{precision} | {recall} | {r['traps']} | {r['dropped']} / {r['restored']} | {agent} |")
+        for m in r["missed"]:
+            notes.append(f"- `{r['pkg']}` ({r['mode']}) missed: {m}")
+        for f in r["false_flags"]:
+            notes.append(f"- `{r['pkg']}` ({r['mode']}) false flag: {f}")
+        if r["skipped"]:
+            notes.append(f"- `{r['pkg']}` ({r['mode']}): agent skipped {', '.join(r['skipped'])}; code ran them afterwards.")
+        if r.get("model"):
+            notes.append(f"- `{r['pkg']}` ({r['mode']}): model `{r['model']}`.")
+    L += ["", "## Notes", *(notes or ["- No misses or false flags."]), "",
+          "## How it is scored",
+          "- **Caught:** a RULE_FAILED finding with the same rule AND element as the planted error (an error spanning several sheets must be flagged on each).",
+          "- **False flag:** any other RULE_FAILED finding.",
+          "- **Review traps:** design-intent items (name variant, narrow room) must be NEEDS_REVIEW, not RULE_FAILED.",
+          "- **Guardrail:** *dropped* = findings the model returned that no tool produced; *restored* = fields the model changed that were reset to the tool's values.",
+          "- Test packages are synthetic and were written alongside the checks, so high scores here show the checks work as designed, not that they generalise to real drawing sets."]
+    return "\n".join(L)
 
-    md_lines.extend([
-        "",
-        "## Definitions",
-        "- **Planted Errors:** Known errors authored in `answer_key.csv`.",
-        "- **Caught:** Planted errors successfully identified by rule tools.",
-        "- **Missed:** Planted errors not triggered.",
-        "- **False Flags:** Findings emitted under `RULE_FAILED` that were not in the answer key or brief.",
-        "- **Precision:** `Caught / (Caught + False Flags)`",
-        "- **Recall:** `Caught / Planted`",
-        "- **Review Traps Grouped:** Verification that non-deterministic / design-intent items (e.g. aspect ratio > 3:1, fuzzy name variants) land strictly in `NEEDS_REVIEW` and never in `RULE_FAILED`.",
-        "- **Guardrail Dropped:** Hallucinated or unauthorized findings dropped by the guardrail post-processor.",
-        "",
-        "## Evaluation Notes",
-        "- In `demo_seeded`, Error #7 spans two sheets (`A201` and `A301`). Both R06 findings are required for the one planted error and are counted as caught, with no false flag.",
-        "- In `demo_clean`, zero `RULE_FAILED` items are emitted across all rules. Precision and recall have no denominator.",
-    ])
 
-    out_file = Path("outputs") / "eval.md"
-    out_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(out_file, "w", encoding="utf-8") as f:
-        f.write("\n".join(md_lines))
-
-    print(f"\nEvaluation complete. Output written to: {out_file}\n")
-    print("\n".join(md_lines))
+def main():
+    ap = argparse.ArgumentParser(description="Evaluate the Drawing QA Agent")
+    ap.add_argument("--no-llm", action="store_true")
+    ap.add_argument("--llm-only", action="store_true")
+    a = ap.parse_args()
+    modes = ["no-llm"] if a.no_llm else (["llm"] if a.llm_only else ["no-llm", "llm"])
+    results = [evaluate_package(p, m) for m in modes for p in PACKAGES]
+    md = to_markdown(results)
+    out = Path("outputs") / "eval.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(md, encoding="utf-8")
+    print(md)
 
 
 if __name__ == "__main__":

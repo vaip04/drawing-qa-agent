@@ -71,9 +71,72 @@ def _match_name(room_name: str, brief_name: str, threshold: int = 70) -> bool:
 
 
 # ──────────────────────────────────────────────────────────────────
+# Finishing step applied to every check: stable IDs + sheet numbers
+# ──────────────────────────────────────────────────────────────────
+import functools
+import hashlib
+import re as _re
+
+_FLOOR_WORDS = {"ground": 0, "first": 1, "second": 2, "third": 3}
+
+
+def _plan_sheet_for_floor(pkg, floor):
+    """Return the plan sheet that shows a given floor ('' if none)."""
+    sheets = pkg.get("sheets")
+    if sheets is None or sheets.empty:
+        return ""
+    plans = [r for _, r in sheets.iterrows() if "plan" in str(r["title"]).lower()]
+    generic = ""
+    for r in plans:
+        title = str(r["title"]).lower()
+        hit = [n for w, n in _FLOOR_WORDS.items() if w in title]
+        if not hit:
+            generic = generic or str(r["sheet_no"])
+        elif floor is not None and hit[0] == int(floor):
+            return str(r["sheet_no"])
+    if generic:
+        return generic
+    return str(plans[0]["sheet_no"]) if plans else ""
+
+
+def _floor_of(pkg, element):
+    """Work out which floor a finding's element is on (None if unknown)."""
+    m = _re.search(r"floor\s*(\d+)", str(element), _re.I)
+    if m:
+        return int(m.group(1))
+    names = [n.strip().lower() for n in str(element).split("/")]
+    rooms = pkg.get("rooms")
+    if rooms is not None and not rooms.empty:
+        for _, r in rooms.iterrows():
+            if str(r["name"]).strip().lower() in names:
+                return int(r["floor"])
+    openings = pkg.get("openings")
+    if openings is not None and not openings.empty:
+        for _, o in openings.iterrows():
+            if str(o["tag"]).strip().lower() in names:
+                return int(o["floor"])
+    return None
+
+
+def _finish(check_fn):
+    """Give every finding a stable ID (same input -> same ID) and fill in the sheet number when the check left it blank."""
+    @functools.wraps(check_fn)
+    def wrapper(pkg, rules):
+        out = check_fn(pkg, rules)
+        for f in out:
+            if not f.get("sheet_no"):
+                f["sheet_no"] = _plan_sheet_for_floor(pkg, _floor_of(pkg, f.get("element", "")))
+            key = "|".join(str(f.get(k, "")) for k in ("rule_id", "element", "sheet_no", "issue"))
+            f["finding_id"] = f.get("rule_id", "R") + "-" + hashlib.sha1(key.encode()).hexdigest()[:6]
+        return out
+    return wrapper
+
+
+# ──────────────────────────────────────────────────────────────────
 # R01: Room area from polygon vs area statement (tolerance %)
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R01(pkg, rules):
     tol = rules.get("tolerances", {}).get("area_mismatch_pct", 2.0)
     findings = []
@@ -127,6 +190,7 @@ def check_R01(pkg, rules):
 # R02: Area statement arithmetic
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R02(pkg, rules):
     findings = []
     area_stmt = pkg["area_stmt"]
@@ -184,6 +248,7 @@ def check_R02(pkg, rules):
 # R03: Every required room exists in correct count and floor
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R03(pkg, rules):
     findings = []
     brief = pkg["brief"]
@@ -221,6 +286,7 @@ def check_R03(pkg, rules):
 # R04: Each required room meets brief min_area_sqft
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R04(pkg, rules):
     findings = []
     brief = pkg["brief"]
@@ -258,6 +324,7 @@ def check_R04(pkg, rules):
 # R05: Built-up area and ground coverage within limits
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R05(pkg, rules):
     findings = []
     brief = pkg["brief"]
@@ -320,6 +387,7 @@ def check_R05(pkg, rules):
 # R06: Sheet brief_version matches current brief version
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R06(pkg, rules):
     findings = []
     brief = pkg["brief"]
@@ -350,6 +418,7 @@ def check_R06(pkg, rules):
 # R07: Every callout points to an existing sheet and view
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R07(pkg, rules):
     findings = []
     callouts = pkg["callouts"]
@@ -383,6 +452,7 @@ def check_R07(pkg, rules):
 # R08: Opening tags and sizes match between plans and schedule
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R08(pkg, rules):
     findings = []
     openings = pkg["openings"]
@@ -458,6 +528,7 @@ def check_R08(pkg, rules):
 # R09: Revision in sheet index equals titleblock revision
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R09(pkg, rules):
     findings = []
     sheets = pkg["sheets"]
@@ -486,6 +557,7 @@ def check_R09(pkg, rules):
 # R10: Plan sheets have overall dims, every room dimensioned
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R10(pkg, rules):
     findings = []
     sheets = pkg["sheets"]
@@ -558,6 +630,7 @@ def check_R10(pkg, rules):
 # R11: Room names consistent across rooms.csv, area statement, brief
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R11(pkg, rules):
     findings = []
     rooms = pkg["rooms"]
@@ -630,6 +703,7 @@ def check_R11(pkg, rules):
 # R12: Room overlaps or gaps (geometry sanity)
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R12(pkg, rules):
     findings = []
     rooms = pkg["rooms"]
@@ -674,6 +748,7 @@ def check_R12(pkg, rules):
 # R13: Room aspect ratio (narrow rooms)
 # ──────────────────────────────────────────────────────────────────
 
+@_finish
 def check_R13(pkg, rules):
     findings = []
     rooms = pkg["rooms"]

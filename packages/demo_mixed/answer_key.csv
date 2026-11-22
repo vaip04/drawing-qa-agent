@@ -1,7 +1,7 @@
-error_id,rule_id,group,description
-1,R01,RULE_FAILED,Living Room area on statement 6% higher than polygon (252 vs 267.1)
-2,R02,RULE_FAILED,Floor total 900 != sum of room areas ~943
-3,R03,RULE_FAILED,Brief requires 3 bedrooms on floor 0; only 2 exist
-4,R05,RULE_FAILED,Ground coverage 38.7% exceeds brief limit 35%
-5,R07,RULE_FAILED,Detail callout 1 on A101 targets non-existent sheet A301
-6,R08,RULE_FAILED,Window W02 width 1200mm on plan vs 1000mm in schedule
+error_id,rule_id,group,element,description
+1,R01,RULE_FAILED,Living Room,Living Room area on statement 6% higher than polygon (252 vs 267.1)
+2,R02,RULE_FAILED,Floor 0 total,Floor total 900 != sum of room areas ~943
+3,R03,RULE_FAILED,Bedroom (floor 0),Brief requires 3 bedrooms on floor 0; only 2 exist
+4,R05,RULE_FAILED,Ground coverage,Ground coverage 38.7% exceeds brief limit 35%
+5,R07,RULE_FAILED,detail 1,Detail callout 1 on A101 targets non-existent sheet A301
+6,R08,RULE_FAILED,W02,Window W02 width 1200mm on plan vs 1000mm in schedule

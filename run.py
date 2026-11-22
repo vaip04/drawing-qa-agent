@@ -44,6 +44,7 @@ def run_package(pkg_name: str, no_llm: bool = False, rules=None) -> dict:
         findings = run_all_checks(pkg, rules)
     else:
         # LLM tool-calling agent flow
+        mode_label = "LLM"
         try:
             from src.agent import run_reviewer_agent
             agent_result = run_reviewer_agent(pkg, rules)
@@ -51,9 +52,12 @@ def run_package(pkg_name: str, no_llm: bool = False, rules=None) -> dict:
             llm_summary = agent_result.get("summary", "")
             guardrail_log = agent_result.get("guardrail_log", guardrail_log)
         except Exception as e:
-            print(f"[WARN] LLM Agent failed or not configured: {e}. Falling back to deterministic checks.")
+            # Never hide a failure: say clearly that this report is deterministic only.
+            print(f"[ERROR] LLM agent failed: {e}")
+            print("        This report is DETERMINISTIC ONLY. Fix the error above (often the model name or API key in .env).")
             findings = run_all_checks(pkg, rules)
-            llm_summary = f"Review conducted via deterministic rule suite (LLM fallback: {e})"
+            llm_summary = f"LLM agent failed ({e}). Findings below are from the deterministic checks only."
+            mode_label = "LLM FAILED - deterministic only"
 
     # Save findings.csv
     findings_df = pd.DataFrame(findings)
@@ -74,7 +78,7 @@ def run_package(pkg_name: str, no_llm: bool = False, rules=None) -> dict:
         pkg=pkg,
         findings=findings,
         out_path=report_out,
-        mode="NO-LLM" if no_llm else "LLM",
+        mode="NO-LLM" if no_llm else mode_label,
         llm_summary=llm_summary,
         guardrail_log=guardrail_log
     )

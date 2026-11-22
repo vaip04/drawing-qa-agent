@@ -321,7 +321,7 @@ SHEETS_FIELDS  = ["sheet_no", "title", "brief_version", "revision_index",
 CALLOUT_FIELDS = ["on_sheet", "callout_type", "label", "target_sheet", "target_view"]
 OPENING_FIELDS = ["tag", "type", "floor", "room", "width_mm", "height_mm"]
 SCHED_FIELDS   = ["tag", "type", "width_mm", "height_mm"]
-ANSWER_FIELDS  = ["error_id", "rule_id", "group", "description"]
+ANSWER_FIELDS  = ["error_id", "rule_id", "group", "element", "description"]
 
 
 def write_package(name, brief, rooms, area_rows, sheets, callouts,
@@ -510,6 +510,10 @@ def gen_demo_seeded():
          "description": "Kitchen not dimensioned on sheet A101"},
     ]
 
+    # element = the drawing element each planted error is on (";" = error spans several)
+    for row, el in zip(answer_key, ['Bedroom 2', 'Floor 0 total', 'Grand total', 'Toilet (floor 1)', 'Study', 'Built-up area', 'A201;A301', 'section A', 'D07', 'W04', 'A102', 'Kitchen']):
+        row["element"] = el
+
     write_package(
         "demo_seeded",
         brief=brief,
@@ -585,6 +589,9 @@ def gen_demo_mixed():
         {"error_id": 6, "rule_id": "R08", "group": "RULE_FAILED",
          "description": "Window W02 width 1200mm on plan vs 1000mm in schedule"},
     ]
+
+    for row, el in zip(answer_key, ['Living Room', 'Floor 0 total', 'Bedroom (floor 0)', 'Ground coverage', 'detail 1', 'W02']):
+        row["element"] = el
 
     write_package(
         "demo_mixed",
